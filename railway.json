@@ -1,6 +1,6 @@
 {
     "build": {
-      "builder": "NONE"
+      "builder": "NIXPACKS"
     },
     "deploy": {
       "startCommand": "./deploy.sh"
