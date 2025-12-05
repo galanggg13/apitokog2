@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 
@@ -12,60 +13,59 @@ class AuthController extends Controller
     public function register(Request $request)
     {
         $request->validate([
-            'name' => 'required|min:3',
-            'email' => 'required|email|unique:users',
-            'password' => 'required|min:6'
+            'name'     => 'required|string|max:255',
+            'email'    => 'required|email|unique:users,email',
+            'password' => 'required|min:6',
         ]);
 
         $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password)
+            'name'     => $request->name,
+            'email'    => $request->email,
+            'password' => Hash::make($request->password),
         ]);
 
-        $token = $user->createToken('apptoken')->plainTextToken;
-
         return response()->json([
-            'message' => 'Register berhasil',
-            'user' => $user,
-            'token' => $token
-        ], 201);
+            'message' => 'Register successful',
+            'user'    => $user,
+        ]);
     }
 
-    // LOGIN
+    // LOGIN EMAIL + PASSWORD
     public function login(Request $request)
     {
         $request->validate([
-            'email' => 'required',
-            'password' => 'required'
+            'email'    => 'required|email',
+            'password' => 'required',
         ]);
 
         $user = User::where('email', $request->email)->first();
 
         if (!$user || !Hash::check($request->password, $user->password)) {
-            return response()->json(['message' => 'Email atau password salah'], 401);
+            return response()->json(['message' => 'Invalid email or password'], 401);
         }
 
-        $token = $user->createToken('apptoken')->plainTextToken;
+        // Generate token
+        $token = Str::random(60);
+        $user->api_token = $token;
+        $user->save();
 
         return response()->json([
-            'message' => 'Login berhasil',
-            'user' => $user,
-            'token' => $token
+            'message' => 'Login successful',
+            'token'   => $token,
+            'user'    => $user,
         ]);
     }
 
     // LOGOUT
     public function logout(Request $request)
     {
-        $request->user()->tokens()->delete();
+        $user = $request->user();
 
-        return response()->json(['message' => 'Logout berhasil']);
-    }
+        if ($user) {
+            $user->api_token = null;
+            $user->save();
+        }
 
-    // GET USER INFO
-    public function me(Request $request)
-    {
-        return response()->json($request->user());
+        return response()->json(['message' => 'Logout successful']);
     }
 }
