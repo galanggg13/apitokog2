@@ -9,23 +9,27 @@ class Transaction extends Model
 {
     use HasFactory;
 
-    protected $primaryKey = 'transaction_id';
+    protected $table = 'transactions';
 
+    // Kolom yang boleh diisi
     protected $fillable = [
         'order_id',
         'payment_method',
         'payment_status',
         'midtrans_status',
+        'midtrans_transaction_id',
         'transaction_time',
-        'transaction_id',
         'gross_amount',
         'snap_token',
         'proof_image',
     ];
 
-    // RELASI KE TABEL ORDERS
+    /**
+     * Relasi ke Order
+     * Satu transaksi hanya punya satu order.
+     */
     public function order()
     {
-        return $this->belongsTo(Order::class, 'order_id');
+        return $this->belongsTo(Order::class);
     }
 }
