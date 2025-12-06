@@ -3,34 +3,23 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Product extends Model
 {
-    protected $primaryKey = 'product_id';
-
     protected $fillable = [
-        'image',
-        'colors',
-        'title',
-        'price',
+        'name',
         'description',
+        'price',
+        'stock',
+        'colour',
         'rating',
-        'category_id',
-        'stock'
+        'image',
+        'category_id'
     ];
 
-    public function category()
+    public function category(): BelongsTo
     {
-        return $this->belongsTo(Category::class, 'category_id');
-    }
-
-    public function carts()
-    {
-        return $this->hasMany(Cart::class, 'product_id');
-    }
-
-    public function favorites()
-    {
-        return $this->hasMany(Favorite::class, 'product_id');
+        return $this->belongsTo(Category::class);
     }
 }

@@ -9,15 +9,24 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('products', function (Blueprint $table) {
-            $table->id('product_id');
-            $table->string('title');
+            $table->id(); // primary key
+
+            $table->string('name');
             $table->text('description')->nullable();
-            $table->decimal('price', 10, 2);
+
+            $table->integer('price');
             $table->integer('stock')->default(0);
+
+            $table->string('colour')->nullable();   // ada warna
+            $table->decimal('rating', 3, 2)->default(0); // ⭐ rating (0.00 - 5.00)
             $table->string('image')->nullable();
-            $table->foreignId('category_id')
-                ->constrained('categories', 'category_id')
+
+            // Relasi kategori
+            $table->unsignedBigInteger('category_id');
+            $table->foreign('category_id')
+                ->references('id')->on('categories')
                 ->onDelete('cascade');
+
             $table->timestamps();
         });
     }
