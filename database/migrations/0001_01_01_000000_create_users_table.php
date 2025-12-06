@@ -9,14 +9,20 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('users', function (Blueprint $table) {
-            $table->id('user_id');
+            $table->id(); // WAJIB: primary key bernama 'id' agar aman untuk foreign key
+            
             $table->string('name');
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
+
             $table->string('password');
             $table->string('image')->nullable();
             $table->string('address')->nullable();
+
+            // kalau mau, boleh hapus ini karena Sanctum sudah ganti cara token
             $table->string('api_token', 80)->nullable()->unique();
+
+            $table->rememberToken();
             $table->timestamps();
         });
     }
@@ -26,3 +32,4 @@ return new class extends Migration
         Schema::dropIfExists('users');
     }
 };
+

@@ -2,30 +2,33 @@
 
 namespace App\Models;
 
-use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Notifications\Notifiable;
 
 class User extends Authenticatable
 {
-    use HasFactory, Notifiable;
+    use HasApiTokens, HasFactory, Notifiable;
 
-    protected $primaryKey = 'user_id';
-
+    // Kolom yang boleh diisi
     protected $fillable = [
         'name',
         'email',
         'password',
         'image',
         'address',
-        'role',
-        'api_token',
     ];
 
+    // Kolom yang disembunyikan saat response JSON
     protected $hidden = [
         'password',
-        'api_token',
+        'remember_token',
+        'api_token', // kalau masih dipakai
     ];
 
-    public $timestamps = true;
+    // Type casting biar Laravel pintar baca tipe data
+    protected $casts = [
+        'email_verified_at' => 'datetime',
+    ];
 }
