@@ -1,23 +1,22 @@
-#!/usr/bin/env bash
-set -e
+#!/bin/bash
 
 echo "=============================="
-echo "   RUNNING LARAVEL MIGRATIONS "
+echo "        RAILWAY DEPLOY        "
 echo "=============================="
 
-# pastikan berada di folder project
-cd /app
+composer install --no-dev --optimize-autoloader
 
-# install composer dependencies jika belum ada vendor
-if [ ! -d "vendor" ]; then
-    composer install --no-interaction --prefer-dist --optimize-autoloader
-fi
+echo "🔑 Generating key (safe)..."
+php artisan key:generate --force
 
+echo "🔗 Creating storage symlink..."
+php artisan storage:link || true
+
+echo "🧩 Running migrations..."
 php artisan migrate --force
 
 echo "=============================="
-echo "     MIGRATIONS DONE "
+echo "        DEPLOY FINISHED       "
 echo "=============================="
 
-# start server
-php -S 0.0.0.0:8000 -t public
+php artisan serve --host=0.0.0.0 --port=8000
